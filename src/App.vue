@@ -1,32 +1,58 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
-  </div>
+  <v-app>
+    <v-container>
+      <v-dialog v-model="loading.active" hide-overlay persistent width="300">
+        <v-card color="dark" dark>
+          <v-card-text>
+            loading...
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+      <router-view />
+      <v-snackbar
+        v-model="alert.open"
+        :color="alert.status"
+        :timeout="alert.timeout"
+      >
+        {{ alert.description }}
+      </v-snackbar>
+    </v-container>
+  </v-app>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+<script>
+import { mapState } from "vuex";
+import axios from "axios";
+export default {
+  name: "App",
+  data: () => ({
+    rota: "",
+    snackbar: true,
+  }),
+  created() {
+    this.rota = this.$router.history.pending.name;
+  },
+  computed: {
+    alert() {
+      return this.$store.state.alert;
+    },
+    loading() {
+      return this.$store.state.loading;
+    },
+    ...mapState({
+      /*  loading: ({ kanban }) => kanban.loading, */
+    }),
+  },
+  mounted() {
+    this.$nextTick(() => {
+      console.log(process.env.VUE_APP_URL);
+      console.log(axios.defaults.baseURL);
+    });
+  },
+};
+</script>
